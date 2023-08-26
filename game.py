@@ -98,13 +98,38 @@ class Player:
         self.color = color
         self.size = size
         self.positions = positions
-    
+    def play(self):
+        #TODO
+        # player commands to interact with pieces
+        pass
+    def click_piece(self):
+        # TODO
+        # find position mouse clicked on board
+        # access self.positions to determine which piece was clicked
+        # highlight square
+        # on clicking new square, determine if piece can move to that square
+        pass 
+    def conquered(self,From,To):
+        # TODO
+        # determine if from piece is conquering the to piece, 
+        # has to be piece of opposite color, on square where piece is moving to
+        pass   
+class Comp:
+    def __init__(self, diff,color,size):
+        self.diff = diff
+        self.color = color 
+        self.game = Game(size)
+           
 class Comp:
     def __init__(self,size,color,skill=None):
         self.size = size
         self.color = color  
         self.skill = skill
-        self.pieces = Game(size).positions 
+        self.pieces = Game(size).positions
+    def calc_moves_square(self):
+        #TODO 
+        # calc all moves for given square
+        pass   
 
 G = Game(16)
 positions = G.create_positions()
@@ -115,7 +140,6 @@ while True:
     for e in p.event.get():
         if e.type == p.QUIT:
             sys.exit()
-    G.map()    
-
+    G.map()
     clock.tick(Max_FPS)
     p.display.flip()
