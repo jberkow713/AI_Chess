@@ -10,9 +10,23 @@ allows for human-comp gaming.
 '''
 
 p.init()
-Width, Height = 1024, 1024
+Width, Height = 900,900
 Max_FPS = 15
 clock = p.time.Clock()
+L_BLUE = (0,255,255)
+
+def collision(coords_1,coords_2):
+    # collision function
+    if coords_1[0]>=coords_2[0] and coords_1[0]<=coords_2[1]:
+        if coords_1[1]>=coords_2[2] and coords_1[1]<=coords_2[3]:
+            return True 
+    return False
+
+def click_check():
+    clicked = p.mouse.get_pressed()    
+    if clicked[0] == True or clicked[2]==True:
+        return True
+    return False 
 
 class Piece:
     def __init__(self,type, x,y,size):
@@ -30,9 +44,10 @@ class Game:
         self.pieces = ['kn', 'r', 'b', 'q', 'k', 'p']
         self.screen = p.display.set_mode((Width, Height))   
         self.Sq_sz = int(Width/self.size)
+        self.highlighted = None 
         self.board = self.create_board()        
         self.IMAGES = {}        
-        self.load_images()
+        self.load_images()        
        
     def create_board(self):        
         #Building the board, building coordinates top left of each square 
@@ -56,6 +71,8 @@ class Game:
         return Board
     
     def create_positions(self):
+        # Creating coordinate position for each piece on the board
+        # Run on every move to update 
         positions = {}
         square = 0
         x = 0
@@ -82,7 +99,9 @@ class Game:
                 p.draw.rect(self.screen, color, p.Rect(c*self.Sq_sz, r*self.Sq_sz, self.Sq_sz, self.Sq_sz))
         return self.screen
 
-    def draw_pieces(self):    
+    def draw_pieces(self):
+        if self.highlighted!=None:
+            p.draw.rect(self.screen,L_BLUE,self.highlighted)    
         for r in range(self.size):
             for c in range(self.size):
                 piece = self.board[r][c]
@@ -94,14 +113,37 @@ class Game:
         self.draw_pieces()
 
 class Player:
-    def __init__(self, color,size,positions):
+    def __init__(self, color,size):        
         self.color = color
         self.size = size
-        self.positions = positions
-    def play(self):
-        #TODO
+        self.game = Game(size)
+        self.positions = self.game.create_positions()
+        self.sq_size = self.game.Sq_sz        
+        self.pieces = self.find_usable()              
+            
+    def find_usable(self):
+        usable = {}
+        if self.color =='white':
+            pieces = ['wr', 'wkn', 'wb', 'wq', 'wk', 'wp']
+        else:
+            pieces = ['br', 'bkn', 'bb', 'bq', 'bk', 'bp']    
+        for idx,piece in self.positions.items():
+            if piece.type in pieces:
+                usable[idx]=piece
+        return usable
+
+    def play(self):        
+        pos = p.mouse.get_pos()       
         # player commands to interact with pieces
-        pass
+        # Piece(self.board[i][j],x,y,self.Sq_sz)
+        for idx,piece in self.pieces.items():
+            x_1,x_2  = piece.x,piece.x + self.sq_size 
+            y_1,y_2 = piece.y, piece.y + self.sq_size
+            coords = (x_1,x_2,y_1,y_2)
+            if collision(pos,coords)==True:
+                if click_check() == True:
+                    self.game.highlighted = (x_1,y_1,self.sq_size,self.sq_size)                         
+
     def click_piece(self):
         # TODO
         # find position mouse clicked on board
@@ -131,15 +173,12 @@ class Comp:
         # calc all moves for given square
         pass   
 
-G = Game(16)
-positions = G.create_positions()
-P = Player('white',16,positions)
-print(P.positions)
-while True:        
-
+P = Player('white',16)
+while True:
     for e in p.event.get():
         if e.type == p.QUIT:
             sys.exit()
-    G.map()
+    P.game.map()
+    P.play()
     clock.tick(Max_FPS)
     p.display.flip()
