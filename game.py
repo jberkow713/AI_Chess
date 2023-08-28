@@ -113,10 +113,9 @@ class Game:
         self.draw_pieces()
 
 class Player:
-    def __init__(self, color,size):        
-        self.color = color
-        self.size = size
-        self.game = Game(size)
+    def __init__(self, color,game):        
+        self.color = color        
+        self.game = game
         self.positions = self.game.create_positions()
         self.sq_size = self.game.Sq_sz        
         self.pieces = self.find_usable()              
@@ -136,7 +135,7 @@ class Player:
         pos = p.mouse.get_pos()       
         # player commands to interact with pieces
         # Piece(self.board[i][j],x,y,self.Sq_sz)
-        for idx,piece in self.pieces.items():
+        for piece in self.pieces.values():
             x_1,x_2  = piece.x,piece.x + self.sq_size 
             y_1,y_2 = piece.y, piece.y + self.sq_size
             coords = (x_1,x_2,y_1,y_2)
@@ -156,12 +155,7 @@ class Player:
         # determine if from piece is conquering the to piece, 
         # has to be piece of opposite color, on square where piece is moving to
         pass   
-class Comp:
-    def __init__(self, diff,color,size):
-        self.diff = diff
-        self.color = color 
-        self.game = Game(size)
-           
+
 class Comp:
     def __init__(self,size,color,skill=None):
         self.size = size
@@ -172,13 +166,15 @@ class Comp:
         #TODO 
         # calc all moves for given square
         pass   
-
-P = Player('white',16)
+G = Game(25)
+P = Player('white',G)
+P2 = Player('black',G)
 while True:
     for e in p.event.get():
         if e.type == p.QUIT:
             sys.exit()
-    P.game.map()
+    G.map()
     P.play()
+    P2.play()
     clock.tick(Max_FPS)
     p.display.flip()
