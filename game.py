@@ -26,7 +26,13 @@ def click_check():
     clicked = p.mouse.get_pressed()    
     if clicked[0] == True or clicked[2]==True:
         return True
-    return False 
+    return False
+def board_check(spot,dir,size):
+    # TODO
+    # based on the board, direction, and size of board, determine if the next directional move
+    # pushes piece off the board
+
+
 
 class Piece:
     def __init__(self,type, x,y,size):
@@ -34,6 +40,7 @@ class Piece:
         self.x = x
         self.y = y
         self.size = size
+        self.pieces = ['kn', 'r', 'b', 'q', 'k', 'p']
     def move(self,piece):
         #TODO returns all possible squares for a given piece based on its type
         pass  
