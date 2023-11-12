@@ -27,11 +27,6 @@ def click_check():
     if clicked[0] == True or clicked[2]==True:
         return True
     return False
-def board_check(spot,dir,size):
-    # TODO
-    # based on the board, direction, and size of board, determine if the next directional move
-    # pushes piece off the board
-
 
 
 class Piece:
@@ -42,6 +37,7 @@ class Piece:
         self.size = size
         self.pieces = ['kn', 'r', 'b', 'q', 'k', 'p']
     def move(self,piece):
+
         #TODO returns all possible squares for a given piece based on its type
         pass  
 
@@ -125,7 +121,10 @@ class Player:
         self.game = game
         self.positions = self.game.create_positions()
         self.sq_size = self.game.Sq_sz        
-        self.pieces = self.find_usable()              
+        self.pieces = self.find_usable()
+        self.clicked = None
+        self.timer_on = False 
+        self.highlight_timer = 0               
             
     def find_usable(self):
         usable = {}
@@ -139,16 +138,35 @@ class Player:
         return usable
 
     def play(self):        
-        pos = p.mouse.get_pos()       
+        pos = p.mouse.get_pos()
+               
         # player commands to interact with pieces
         # Piece(self.board[i][j],x,y,self.Sq_sz)
+        if self.timer_on ==True:
+            self.highlight_timer -=1
+            if self.highlight_timer <=0:
+                self.timer_on = False 
         for piece in self.pieces.values():
             x_1,x_2  = piece.x,piece.x + self.sq_size 
             y_1,y_2 = piece.y, piece.y + self.sq_size
             coords = (x_1,x_2,y_1,y_2)
-            if collision(pos,coords)==True:
-                if click_check() == True:
-                    self.game.highlighted = (x_1,y_1,self.sq_size,self.sq_size)                         
+            
+            if self.clicked != None and self.timer_on==False and collision(pos,self.clicked)==True:             
+                if click_check()==True:                    
+                    self.game.highlighted = None
+                    self.clicked = None
+                    self.timer_on = True 
+                    self.highlight_timer =5
+                    return   
+            if self.timer_on == False:
+                if collision(pos,coords)==True:
+                    if click_check() == True:
+                        self.game.highlighted = (x_1,y_1,self.sq_size,self.sq_size)
+                        self.clicked = coords
+                        self.highlight_timer = 5
+                        self.timer_on = True
+                    
+
 
     def click_piece(self):
         # TODO
